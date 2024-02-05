@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    // to be able to work with git commands
     id 'org.ajoberstar.grgit' version '4.1.0'
 }
 
@@ -59,6 +60,20 @@ task commitAndPushWithTag {
             def currentBranch = grgit.branch.current().name
 
             println "Current Branch [" + currentBranch + "]"
+
+
+//            // Get the custom commit message from the command line
+//            def customCommitMessage = project.hasProperty("commitMessage") ? project.commitMessage : "Commit Message " + UUID.randomUUID().toString()
+//
+//            // Commit changes with the custom message
+//            exec {
+//                commandLine "git", "commit", "-am", customCommitMessage
+//            }
+//
+//            // Push changes to the remote repository
+//            exec {
+//                commandLine "git", "push", "origin", currentBranch
+//            }
 
             // Create a new tag
             exec {
