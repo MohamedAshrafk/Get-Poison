@@ -8,7 +8,7 @@ import java.util.Random;
 public class Main {
 
     // you can configure the  number of containers to any number
-    private final static int numberOfContainers = 1500;
+    private final static int numberOfContainers = 1024;
     // you can configure the position of the poison (-1 for setting it to a random position)
     private final static int setPoisonPositionTo = -1;
 

@@ -1,11 +1,13 @@
 plugins {
     id 'java'
+    id 'org.ajoberstar.grgit' version '4.1.0'
 }
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 
 repositories {
+    google()
     mavenCentral()
 }
 
@@ -16,4 +18,59 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+task commitAndPushWithTag {
+    doLast {
+        // Get the latest tag version from the remote repository
+        def latestTag = 'git describe --tags --abbrev=0'.execute().text.trim()
+        println "Latest Tag [" + latestTag + "]"
+
+        // Extract the version components using a safer approach
+        def matcher = (latestTag =~ /(\d+)\.(\d+)\.(\d+)/)
+
+        // Check if a match was found
+        if (matcher) {
+            // Extract the version components
+            def (major, minor, patch) = matcher[0][1..3]
+
+            // Increment the version components
+            def newMajor = major.toInteger()
+            def newMinor = minor.toInteger()
+            def newPatch = patch.toInteger() + 1
+
+            // Handle versioning logic for major and minor increments
+            if (newPatch == 10) {
+                newPatch = 0
+                newMinor += 1
+            }
+
+            if (newMinor == 10) {
+                newMinor = 0
+                newMajor += 1
+            }
+
+            // Set the new tag name
+            def newTagName = "v$newMajor.$newMinor.$newPatch"
+
+            println "New Tag Name [" + newTagName + "]"
+
+            // Get the current Git branch
+            def currentBranch = grgit.branch.current().name
+
+            println "Current Branch [" + currentBranch + "]"
+
+            // Create a new tag
+            exec {
+                commandLine "git", "tag", newTagName
+            }
+
+            // Push the new tag to the remote repository
+            exec {
+                commandLine "git", "push", "origin", newTagName
+            }
+        } else {
+            println "Error: Unable to extract version components from the latest tag."
+        }
+    }
 }
